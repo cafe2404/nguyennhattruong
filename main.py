@@ -6,6 +6,8 @@ from video_processor import VideoProcessor
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
+import moviepy.config as moviepy_config
+moviepy_config.IMAGEMAGICK_BINARY = 'magick'
 
 class ProgressManager:
     def __init__(self):
@@ -30,7 +32,7 @@ class VideoCreator:
         self.setup_whisper_config()
         self.audio_processor = AudioProcessor(self.config)
         self.video_processor = VideoProcessor(self.config)
-
+        
     def load_config(self, config_file):
         """Đọc file cấu hình"""
         if not os.path.exists(config_file):
