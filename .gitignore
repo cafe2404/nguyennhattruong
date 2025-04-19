@@ -175,3 +175,4 @@ cython_debug/
 setup.json
 icon/image.ico
 icon/video.ico
+images/*

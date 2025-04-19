@@ -54,7 +54,8 @@ class VideoCreator:
 
         try:
             # Thực hiện nhận dạng với Whisper
-            result = self.whisper_model.transcribe(
+            model = whisper.load_model(self.whisper_model)
+            result = model.transcribe(
                 audio_path,
                 language=self.whisper_language,
                 task="transcribe",

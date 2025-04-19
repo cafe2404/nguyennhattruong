@@ -222,7 +222,6 @@ class AudioProcessor:
             self.progress.print_error(f"Lỗi trong quá trình xử lý audio: {str(e)}")
             raise 
 
-    def generate_subtitles_from_audio(self, audio_path):
         """Tạo subtitle tự động từ audio sử dụng Whisper"""
         self.progress.print_message("Đang tạo subtitle từ audio...")
         subtitles = []
@@ -251,6 +250,7 @@ class AudioProcessor:
             # Bước 3: Transcribe audio
             try:
                 self.progress.print_message("Bắt đầu transcribe audio...")
+                model = whisper.load_model(self.whisper_model)
                 result = self.whisper_model.transcribe(
                     audio_path,
                     language=self.whisper_language,
