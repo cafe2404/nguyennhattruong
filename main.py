@@ -32,7 +32,7 @@ class VideoCreator:
         self.setup_whisper_config()
         self.audio_processor = AudioProcessor(self.config)
         self.video_processor = VideoProcessor(self.config)
-        
+
     def load_config(self, config_file):
         """Đọc file cấu hình"""
         if not os.path.exists(config_file):
@@ -120,5 +120,6 @@ if __name__ == "__main__":
     try:
         creator = VideoCreator("config.ini")
         creator.create_video()
+        input("Nhấn Enter để thoát...")
     except Exception as e:
         print(f"Lỗi: {str(e)}") 
