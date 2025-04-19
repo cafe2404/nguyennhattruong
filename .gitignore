@@ -172,3 +172,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+ffmpeg/bin/ffmpeg.exe
+setup.json
+icon/image.ico
+icon/video.ico
