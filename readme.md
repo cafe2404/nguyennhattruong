@@ -29,6 +29,16 @@ pip install -r requirements.txt
 - Chọn "Install legacy utilities" khi cài đặt
 - Thêm vào PATH hệ thống
 
+➜ Kiểm tra cài đặt ImageMagick và PATH
+
+### 4. Cài đặt FFmpeg
+- Tải FFmpeg từ: https://github.com/BtbN/FFmpeg-Builds/releases
+- Tải phiên bản ffmpeg-master-latest-win64-gpl.zip
+- Giải nén và copy 3 file trong thư mục bin (ffmpeg.exe, ffprobe.exe, ffplay.exe) vào thư mục ffmpeg của project
+- Hoặc thêm đường dẫn FFmpeg vào PATH hệ thống
+
+➜ Kiểm tra cài đặt FFmpeg và PATH
+
 ## Sử dụng
 
 ### 1. Chuẩn bị dữ liệu
@@ -41,29 +51,12 @@ pip install -r requirements.txt
 venv\Scripts\python.exe main.py
 ```
 
-## Cấu trúc thư mục
-nguyennhattruong/
-│
-├── images/ # Thư mục chứa ảnh
-├── audios/ # Thư mục chứa audio
-├── ffmpeg/ # FFmpeg (có sẵn)
-├── output/ # Video đầu ra
-│
-├── main.py
-├── video_processor.py
-├── audio_processor.py
-├── config.ini
-├── background-music.mp3
-└── requirements.txt
-```
-
 ## Xử lý lỗi thường gặp
 
 ### 1. Lỗi ImageMagick
 ```
 MoviePy Error: creation of None failed
 ```
-➜ Kiểm tra cài đặt ImageMagick và PATH
 
 ### 2. Lỗi không tìm thấy file
 ```
@@ -76,6 +69,12 @@ FileNotFoundError: Không tìm thấy file
 Lỗi khi tạo subtitle
 ```
 ➜ Kiểm tra cài đặt whisper và kết nối mạng
+
+### 4. Lỗi FFmpeg
+```
+FileNotFoundError: [WinError 2] The system cannot find the file specified
+```
+➜ Kiểm tra cài đặt FFmpeg và PATH
 
 ## Yêu cầu hệ thống
 - Windows 10/11
