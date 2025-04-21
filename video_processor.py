@@ -10,7 +10,6 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 import subprocess
-import sys
 
 class ProgressManager:
     def __init__(self):
@@ -357,23 +356,7 @@ class VideoProcessor:
             # Áp dụng hiệu ứng zoom
             clip = clip.fl(lambda gf, t: make_frame(t))
             
-            # Thêm subtitle nếu có
-            if subtitles:
-                current_subtitles = [sub for sub in subtitles 
-                                  if sub["start"] <= index * self.image_duration < sub["end"]]
-                for sub in current_subtitles:
-                    try:
-                        subtitle_clip = self.create_subtitle_clip(
-                            sub["text"], 
-                            sub["end"] - sub["start"],
-                            sub["start"] - index * self.image_duration
-                        )
-                        if subtitle_clip is not None:
-                            clip = CompositeVideoClip([clip, subtitle_clip])
-                    except Exception as e:
-                        self.progress.print_warning(f"Lỗi khi tạo subtitle clip: {str(e)}")
-            
-            # Lưu clip tạm
+    
             output_path = os.path.join(temp_dir, f"temp_video_{index}.mp4")
             self.progress.print_message(f"Đang ghi clip tạm: {output_path}")
             
@@ -609,7 +592,7 @@ class VideoProcessor:
             self.progress.print_error(f"Lỗi khi tạo video subtitle: {str(e)}")
             return None
 
-    def create_video(self, output_dir, temp_audio_path, temp_final_audio_path, subtitles=None):
+    def create_video(self, output_dir, temp_audio_path, temp_final_audio_path):
         """Tạo video từ ảnh và audio"""
         try:
             # Tạo thư mục output nếu chưa tồn tại
@@ -647,93 +630,11 @@ class VideoProcessor:
             
             if video_clip is None:
                 raise Exception("Không thể tạo video clip từ ảnh")
-            
             # Tải audio
             audio_clip = AudioFileClip(temp_final_audio_path)
             
             # Thêm audio vào video
             video_clip = video_clip.set_audio(audio_clip)
-            
-            # Thêm subtitle nếu có
-            if subtitles:
-                self.progress.print_message("Đang thêm subtitle vào video...")
-                
-                # Lấy cấu hình subtitle
-                font = self.config['subtitle'].get('font', 'Arial')
-                font_size = self.config['subtitle'].getint('font_size', 44)
-                color = self.config['subtitle'].get('color', '#FFFFFF')
-                stroke_color = self.config['subtitle'].get('stroke_color', '#000000')
-                stroke_width = self.config['subtitle'].getint('stroke_width', 0)
-                position = self.config['subtitle'].get('position', 'bottom')
-                margin_bottom = self.config['subtitle'].getint('margin_bottom', 50)
-                background_opacity = self.config['subtitle'].getfloat('background_opacity', 0.7)
-                
-                # Tạo các text clip
-                text_clips = []
-                for sub in subtitles:
-                    try:
-                        # Tạo text clip
-                        txt_clip = TextClip(
-                            sub['text'],
-                            fontsize=font_size,
-                            font=font,
-                            color=color,
-                            stroke_color=stroke_color,
-                            stroke_width=stroke_width,
-                            method='label',
-                            align='center'
-                        )
-                        
-                        # Tạo background nếu cần
-                        if background_opacity > 0:
-                            # Tạo background clip
-                            bg_color = self.config['subtitle'].get('background_color', 'rgb(255,236,67)')
-                            # Chuyển đổi chuỗi rgb thành tuple
-                            if bg_color.startswith('rgb('):
-                                bg_color = bg_color.replace('rgb(', '').replace(')', '')
-                                r, g, b = map(int, bg_color.split(','))
-                                bg_color = (r, g, b)
-                            padding = self.config['subtitle'].getint('background_padding', 15)
-                            
-                            # Tính kích thước background
-                            bg_width = txt_clip.size[0] + padding * 2
-                            bg_height = txt_clip.size[1] + padding * 2
-                            
-                            # Tạo background đơn giản
-                            bg_clip = ColorClip(size=(bg_width, bg_height), color=bg_color)
-                            bg_clip = bg_clip.set_opacity(background_opacity)
-                            
-                            # Đặt text vào giữa background
-                            txt_clip = txt_clip.set_position(('center', 'center'))
-                            
-                            # Kết hợp background và text
-                            txt_clip = CompositeVideoClip([bg_clip, txt_clip])
-                        
-                        # Đặt vị trí
-                        if position == 'bottom':
-                            y_pos = self.height - margin_bottom - txt_clip.size[1]
-                            txt_clip = txt_clip.set_position(('center', y_pos))
-                        elif position == 'top':
-                            txt_clip = txt_clip.set_position(('center', margin_bottom))
-                        elif position == 'center':
-                            txt_clip = txt_clip.set_position('center')
-                        else:  # custom
-                            x_pos = self.config['subtitle'].getint('x_position', 0)
-                            y_pos = self.config['subtitle'].getint('y_position', 0)
-                            txt_clip = txt_clip.set_position((x_pos, y_pos))
-                        
-                        # Đặt thời gian
-                        txt_clip = txt_clip.set_start(sub['start']).set_duration(sub['end'] - sub['start'])
-                        
-                        text_clips.append(txt_clip)
-                        
-                    except Exception as e:
-                        self.progress.print_warning(f"Lỗi khi tạo text clip: {str(e)}")
-                        continue
-                
-                # Kết hợp video và text clips
-                if text_clips:
-                    video_clip = CompositeVideoClip([video_clip] + text_clips)
             
             # Ghi video cuối cùng
             self.progress.print_message(f"Đang ghi video vào: {output_file}")

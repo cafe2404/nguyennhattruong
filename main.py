@@ -29,7 +29,6 @@ class VideoCreator:
     def __init__(self, config_file="config.ini"):
         self.config = self.load_config(config_file)
         self.progress = ProgressManager()
-        self.setup_whisper_config()
         self.audio_processor = AudioProcessor(self.config)
         self.video_processor = VideoProcessor(self.config)
 
@@ -41,48 +40,7 @@ class VideoCreator:
         config = configparser.ConfigParser()
         config.read(config_file, encoding="utf-8")
         return config
-
-    def setup_whisper_config(self):
-        """Cấu hình cho Whisper"""
-        sub_config = self.config["subtitle"]
-        self.whisper_model = sub_config.get("model", "base")
-        self.whisper_language = sub_config.get("language", "vi")
-
-    
-    def generate_subtitles_from_audio(self, audio_path):
-        """Tạo subtitle tự động từ audio sử dụng Whisper"""
-        self.progress.print_message("Đang tạo subtitle từ audio...")
-        subtitles = []
-
-        try:
-            # Thực hiện nhận dạng với Whisper
-            model = whisper.load_model(self.whisper_model)
-            result = model.transcribe(
-                audio_path,
-                language=self.whisper_language,
-                task="transcribe",
-                fp16=True,
-                verbose=False
-            )
-
-            # Xử lý kết quả theo segments
-            segments = result["segments"]
-            for segment in segments:
-                text = segment["text"].strip()
-                if text:
-                    subtitles.append({
-                        "text": text,
-                        "start": segment["start"],
-                        "end": segment["end"]
-                    })
-
-            self.progress.print_message(f"Đã tạo được {len(subtitles)} subtitle")
-            return subtitles
-            
-        except Exception as e:
-            self.progress.print_error(f"Lỗi khi tạo subtitle: {str(e)}")
-            return subtitles
-
+   
     def create_video(self):
         """Tạo video hoàn chỉnh"""
         try:
@@ -102,13 +60,9 @@ class VideoCreator:
             if not os.path.exists(temp_final_audio_path) or not os.path.exists(temp_audio_path):
                 raise FileNotFoundError(f"Không tìm thấy file audio: {temp_final_audio_path} hoặc {temp_audio_path}")
             
-            # Bước 2: Tạo subtitle từ audio
-            self.progress.print_message("\nBước 2: Tạo subtitle...")
-            subtitles = self.generate_subtitles_from_audio(temp_audio_path)
-            
             # Bước 3: Tạo video
             self.progress.print_message("\nBước 3: Tạo video...")
-            self.video_processor.create_video(output_dir, temp_audio_path, temp_final_audio_path, subtitles)
+            self.video_processor.create_video(output_dir, temp_audio_path, temp_final_audio_path)
             
             self.progress.print_message("\nHoàn thành!")
             

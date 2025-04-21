@@ -176,3 +176,7 @@ setup.json
 icon/image.ico
 icon/video.ico
 images/*
+output_video.mp4
+audios/ElevenLabs_2025-04-21T09_21_09_MinhTrung - Vietnamese male & warm voice_pvc_sp108_s65_sb74_f2-5.mp3
+temp/temp_audio.mp3
+temp/temp_final_audio.mp3
